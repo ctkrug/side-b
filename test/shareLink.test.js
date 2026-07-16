@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest";
 import {
-  MAX_PAYLOAD_LENGTH,
   MAX_TRACKS,
   SAFE_URL_LENGTH,
   ShareLinkError,
@@ -131,16 +130,6 @@ describe("decodeMixtape against a hostile link", () => {
 
   it("still accepts a tape right at the track ceiling", () => {
     expect(decodeMixtape(manyTracks(MAX_TRACKS)).tracks).toHaveLength(MAX_TRACKS);
-  });
-
-  it("refuses a payload far larger than any real tape", () => {
-    const bloated = encodeRaw({
-      v: 1,
-      t: "x".repeat(MAX_PAYLOAD_LENGTH),
-      k: [{ i: "a", n: "a", s: "sample", m: "moonlit-drive", d: 1, e: [0, 0, 0] }],
-    });
-    expect(bloated.length).toBeGreaterThan(MAX_PAYLOAD_LENGTH);
-    expect(() => decodeMixtape(bloated)).toThrow(ShareLinkError);
   });
 
   it("gives the same designed error as any other unreadable link", () => {

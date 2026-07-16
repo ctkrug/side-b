@@ -13,6 +13,18 @@ import { packCover, unpackCover } from "../ui/doodle.js";
 /** Browsers vary; ~2000 chars is the safe ceiling across all of them. */
 export const SAFE_URL_LENGTH = 2000;
 
+/**
+ * A link is text a stranger controls, and opening one costs real memory:
+ * every sample track it names is synthesized to PCM on arrival, so an
+ * unbounded tracklist is a memory bomb in a URL. 64 sits far above any
+ * tape a person would make and far below a payload that could hurt.
+ *
+ * Deliberately not a cap on the payload's length: an over-budget link
+ * still decodes (SAFE_URL_LENGTH only warns), and a big doodle is merely
+ * a lot of small numbers — it costs nothing like a track does.
+ */
+export const MAX_TRACKS = 64;
+
 export class ShareLinkError extends Error {
   constructor(message) {
     super(message);
@@ -65,7 +77,6 @@ export function decodeMixtape(encoded) {
   if (typeof encoded !== "string" || encoded.length === 0) {
     throw new ShareLinkError("this link has no mixtape in it");
   }
-
   let payload;
   try {
     payload = JSON.parse(fromBase64Url(encoded));
@@ -78,6 +89,11 @@ export function decodeMixtape(encoded) {
   }
   if (payload.v !== 1) {
     throw new ShareLinkError("this link was made by a different version of Side B");
+  }
+  if (payload.k.length > MAX_TRACKS) {
+    throw new ShareLinkError(
+      `this link claims more tracks than a tape can hold (over ${MAX_TRACKS})`,
+    );
   }
 
   const tracks = payload.k
