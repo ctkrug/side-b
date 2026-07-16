@@ -1,72 +1,57 @@
 # Side B
 
-Pick a few songs, drop them into a virtual mixtape, and watch it *record* onto an
-animated cassette — reels spinning in sync with real playback — while a from-scratch
-Web Audio tape-emulation chain warms, warps, and hisses the audio into something that
-actually sounds like tape, not an MP3 with a filter slapped on. When it's done, share
-the mixtape with a link and a cover you doodled yourself.
+**▶ Live demo — [apps.charliekrug.com/side-b](https://apps.charliekrug.com/side-b/)**
 
-## Why
+Turn a playlist into a tape you can hear.
 
-Every "mixtape maker" on the web today is a cover-art generator: pick a template,
-type a title, export a JPEG. None of them touch the audio. Side B does the opposite —
-the visual cassette is secondary to a real signal chain built in the Web Audio API:
+[![CI](https://github.com/ctkrug/side-b/actions/workflows/ci.yml/badge.svg)](https://github.com/ctkrug/side-b/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-e8934a.svg)](LICENSE)
 
-- **Wow & flutter** — slow and fast pitch modulation from LFOs driving a variable
-  delay line, modeling motor speed instability in a real tape transport.
-- **Saturation** — soft-clipping waveshaper that warms transients the way magnetic
-  tape compresses and colors a signal.
-- **Hiss** — filtered noise floor mixed under the program material, level-matched so
-  it reads as tape hiss rather than static.
-- **Frame-synced cassette animation** — the reels' rotation and take-up ratio are
-  driven by actual `AudioContext` playback position, not a looping GIF.
+Side B is a cassette tape maker that runs in your browser. Pick a few songs, press
+record, and you hear them the way a tape would have played them: a hiss floor under the
+quiet parts, the pitch wobbling as a worn motor drags, and the transients rounded off by
+saturation. The reels turn in time with the audio. When it sounds right, one link carries
+the whole tape to whoever you made it for.
 
-## The wow moment
+![Side B recording a two-track tape, reels wound on, a hand-drawn cover on the j-card label](docs/media/side-b.jpg)
 
-Drag three tracks into the tray, hit record, and the cassette reels visibly spin while
-a warm, hissy, slightly-warped version of the audio plays in real time — before you've
-touched a single setting.
+## Who it's for
+
+People who still make a playlist for one specific person and want to send something that
+feels made rather than listed. Every other mixtape tool on the web is a cover-art
+generator: pick a template, type a title, export a JPEG to post next to a streaming link.
+The audio is never touched. Side B works the other way round. The sound is the point.
+
+## Why it sounds like tape and not like a filter
+
+The chain is built from scratch in the Web Audio API, and every part of it is live:
+
+- **Wow and flutter.** Two LFOs drive a variable delay line, bending pitch slowly and
+  quickly at once, the way an unstable transport does.
+- **Saturation.** A waveshaper curve compresses peaks and adds harmonics, so loud
+  transients round off instead of clipping.
+- **Hiss.** Filtered noise sits under the music, level matched so it reads as a noise
+  floor rather than static.
+- **Reels driven by the audio clock.** Rotation and the take-up ratio come from
+  `AudioContext` playback position, so the picture cannot drift from the sound.
+
+Drag a slider and the graph retunes under the playhead. There is no rendered file to wait
+for, and no plugin, server, or pre-baked audio anywhere in it.
 
 ## Using it
 
-1. **Load the tray.** Click a built-in track, or drop your own audio files onto
-   the tray (they are decoded in your browser and never uploaded anywhere).
-2. **Hit record.** The reels spin, the tape counter runs, and you hear the full
-   chain — wow/flutter, saturation and hiss — with no setup.
-3. **Turn the knobs.** Each track has its own wow/flutter, saturation and hiss
-   sliders. They retune the live audio graph as you drag: there is no baked
-   file to re-render.
-4. **Doodle a cover** on the pad, and it appears on the cassette's j-card label.
-5. **Share the tape.** The whole mixtape — track list, every effect setting and
-   your doodle — is encoded into the link itself. No account, no backend.
+1. **Load the tray.** Click a built-in track, or drop your own audio files on it. Files
+   are decoded in your browser and never uploaded.
+2. **Press record.** The reels spin, the counter runs, and the full chain is already on.
+   No setup.
+3. **Turn the knobs.** Wow and flutter, saturation and hiss, per track.
+4. **Doodle a cover.** It prints onto the cassette's j-card label.
+5. **Press Share tape.** The link lands on your clipboard.
 
-Built-in tracks are synthesized from scratch in code, which is what lets a
-shared link rebuild the exact same tape on someone else's machine. A tape
-containing your own files will list those tracks as missing for whoever opens
-it, and ask them to supply the audio.
-
-## Features
-
-- Drag-and-drop track tray with reorderable rows (local files or built-in tracks)
-- Live tape chain: wow/flutter, saturation and a filtered hiss floor, per track
-- Canvas cassette frame-synced to `AudioContext` playback position
-- Hand-drawn cover art doodle pad, drawn onto the cassette label
-- Shareable mixtape link, encoded client-side with no backend
-- Synthesized interface sounds with a mute toggle that persists
-
-## Stack
-
-- Vanilla JavaScript (ES modules), no framework
-- Web Audio API for all DSP — no pre-baked audio files for effects
-- Canvas 2D for the cassette player and doodle pad
-- [Vite](https://vitejs.dev/) for dev server + static production build
-- [Vitest](https://vitest.dev/) for unit tests
-
-## Status
-
-The core is built and playable end to end. See [`docs/VISION.md`](docs/VISION.md)
-for the design, [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for the code map,
-and [`docs/BACKLOG.md`](docs/BACKLOG.md) for what is left.
+The share link carries the tracklist, every effect setting and your drawing, encoded in
+the URL itself. There is no backend and no account. Built-in tracks are synthesized in
+code, which is what lets a link rebuild the same tape on someone else's machine; a tape
+holding your own files asks whoever opens it to supply that audio.
 
 ## Development
 
@@ -76,11 +61,30 @@ npm run dev      # local dev server
 npm test         # unit tests
 npm run coverage # unit tests + a coverage report
 npm run lint     # eslint
-npm run build    # static production build into dist/
+npm run build    # static production build into site/
 ```
 
-The build is base-path relative, so `dist/` can be served from any subpath.
+448 tests cover the DSP, the mixtape model, the share-link codec and the renderer, at
+99.7% of lines. The build is base-path relative, so the output can be served from any
+subpath.
+
+## Stack
+
+- Vanilla JavaScript, ES modules, no framework
+- Web Audio API for all DSP, with no pre-baked audio files
+- Canvas 2D for the cassette and the doodle pad
+- [Vite](https://vitejs.dev/) for the dev server and the static build
+- [Vitest](https://vitest.dev/) and [fast-check](https://fast-check.dev/) for tests
+
+## Docs
+
+- [`docs/VISION.md`](docs/VISION.md) for what it is and why
+- [`docs/DESIGN.md`](docs/DESIGN.md) for the visual direction and tokens
+- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for the code map and signal graph
+- [`docs/launch/devto.md`](docs/launch/devto.md) for a writeup of two build problems
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+MIT, see [LICENSE](LICENSE).
+
+More of Charlie's projects → https://apps.charliekrug.com
