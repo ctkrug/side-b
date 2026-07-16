@@ -158,7 +158,9 @@ export function createSfx({ context, storage = null, now = () => Date.now() }) {
 
     /** Play a named sound. Unknown names and no-audio environments no-op. */
     play(name) {
-      const voice = voices[name];
+      // Own keys only: every name on Object.prototype would otherwise
+      // resolve, and "__proto__" is not even callable.
+      const voice = Object.hasOwn(voices, name) ? voices[name] : null;
       if (!voice || !shouldPlay(name)) {
         return false;
       }
