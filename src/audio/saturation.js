@@ -14,6 +14,17 @@ export function softClipSample(sample, amount = 0.3) {
 }
 
 /**
+ * The cubic curve maps a full-scale input to 2/3, so the saturated path
+ * needs makeup gain to reach the same ceiling as the dry path. Derived
+ * from the curve itself rather than hard-coded, so the two stay in step if
+ * the curve shape ever changes.
+ */
+export function saturationMakeupGain(amount = 0.3) {
+  const ceiling = softClipSample(1, amount);
+  return ceiling > 0 ? 1 / ceiling : 1;
+}
+
+/**
  * Build a Float32Array transfer curve suitable for WaveShaperNode.curve,
  * sampling softClipSample across the [-1, 1] input range.
  */
