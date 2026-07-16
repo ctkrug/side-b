@@ -155,4 +155,17 @@ describe("tapeProgress", () => {
   it("is 0 (not NaN) for an empty tape", () => {
     expect(tapeProgress(createMixtape(), 5)).toBe(0);
   });
+
+  // The reel renderer feeds this straight into canvas geometry, and a
+  // non-finite radius throws there — taking the animation loop with it.
+  it.each([[NaN], [undefined], ["halfway"], [null]])(
+    "is 0 (not NaN) for the playhead %p",
+    (elapsed) => {
+      expect(tapeProgress(tape(), elapsed)).toBe(0);
+    },
+  );
+
+  it("is 1 for an infinite playhead", () => {
+    expect(tapeProgress(tape(), Infinity)).toBe(1);
+  });
 });
