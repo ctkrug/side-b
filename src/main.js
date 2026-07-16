@@ -16,7 +16,7 @@ import {
 } from "./mixtape/shareLink.js";
 import { createCassetteRenderer, formatTapeTime } from "./ui/cassetteRenderer.js";
 import { addTrack, removeTrack, reorderTrack } from "./ui/tray.js";
-import { ICONS, clear, el, icon } from "./ui/dom.js";
+import { ICONS, append, clear, el, icon } from "./ui/dom.js";
 import { createToaster } from "./ui/toast.js";
 import {
   COVER_COLORS,
@@ -765,7 +765,8 @@ function boot() {
     ],
   );
 
-  root.append(
+  append(
+    root,
     el("div", { class: "grain", "aria-hidden": "true" }),
     el("header", { class: "topbar" }, [
       wordmark(),
