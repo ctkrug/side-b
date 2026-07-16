@@ -51,6 +51,11 @@ doesn't land first.
   - Reel angles use `reelRotationRadians`/`takeUpReelRadiusRatio` driven by the
     current track's elapsed playback time, recomputed every animation frame via
     `requestAnimationFrame`.
+  - **Deviation, deliberate:** `reelRotationRadians` (angle from absolute elapsed
+    time) was replaced by `advanceAngle` (per-frame integration) and removed. A
+    reel's speed changes as it fills, and deriving the angle from absolute time
+    makes it *jump* whenever the speed changes. Radius still comes from
+    `takeUpReelRadiusRatio`, and rotation is still driven by playback position.
   - Canvas renders at `devicePixelRatio × CSS size` and redraws correctly after a
     window resize (checked at 390px, 768px, 1440px).
   - Reels idle-spin slowly when no mixtape is recording, per DESIGN.md's signature
