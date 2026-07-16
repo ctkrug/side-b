@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Side B — make a mixtape online that sounds like tape</title>
+    <meta
+      name="description"
+      content="Make a mixtape online: drop in songs, hear them play through a real tape chain with hiss, wobble and saturation, then share the whole tape as one link."
+    />
+    <meta property="og:title" content="Side B — make a mixtape online that sounds like tape" />
+    <meta
+      property="og:description"
+      content="A cassette tape maker that runs in your browser. Pick songs, press record, and hear them on tape. Share the mixtape as a link."
+    />
+    <meta property="og:type" content="website" />
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231c140f'/%3E%3Crect x='8' y='20' width='48' height='28' rx='6' fill='%23e8934a'/%3E%3Ccircle cx='22' cy='34' r='7' fill='%231c140f'/%3E%3Ccircle cx='42' cy='34' r='7' fill='%231c140f'/%3E%3Ccircle cx='22' cy='34' r='2.5' fill='%23e8934a'/%3E%3Ccircle cx='42' cy='34' r='2.5' fill='%23e8934a'/%3E%3C/svg%3E"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700&family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <script type="module" crossorigin src="./assets/index-Dm0SLT6U.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-NvDyPzWO.css">
+  </head>
+  <body>
+    <div id="app"></div>
+
+    <section class="page" aria-labelledby="about-title">
+      <div class="page__inner">
+        <h2 class="page__title" id="about-title">Make a mixtape online</h2>
+        <p class="page__lead">
+          Side B is a free cassette tape maker that runs in your browser. Pick a few songs,
+          press record, and you hear them the way a tape would have played them: a hiss
+          floor under the quiet parts, the pitch wobbling as a worn motor drags, and the
+          transients rounded off by saturation. The reels turn in time with the audio and
+          the counter runs. When it sounds right, one link carries the whole tape to
+          whoever you made it for.
+        </p>
+        <p class="page__note">
+          Nothing is uploaded. Your files are decoded in your browser and never leave it.
+        </p>
+
+        <h3 class="page__subtitle">Why it sounds like tape and not like a filter</h3>
+        <p>
+          The audio runs through a chain built from scratch in the Web Audio API. Wow and
+          flutter come from two LFOs driving a variable delay line, which bends pitch the
+          way an unstable transport does. Saturation is a waveshaper curve that compresses
+          peaks and adds harmonics. The hiss is filtered noise mixed under the music, level
+          matched so it reads as a noise floor rather than static. Every one of those is
+          live: drag a slider and the graph retunes under the playhead. There is no
+          rendered file to wait for.
+        </p>
+
+        <h3 class="page__subtitle">Questions</h3>
+        <dl class="faq">
+          <dt class="faq__q">How do I make a mixtape online?</dt>
+          <dd class="faq__a">
+            Click one of the built-in tracks to start, or drop your own audio files onto the
+            tray. Press Record. Set wow and flutter, saturation and hiss per track if you
+            want to. Draw a cover. Press Share tape and the link lands on your clipboard.
+          </dd>
+
+          <dt class="faq__q">Is this a cassette tape maker, or just cover art?</dt>
+          <dd class="faq__a">
+            Most cassette tape makers online draw a picture of a tape around a playlist
+            link. Side B processes the sound. The cassette on screen is driven by playback
+            position, so the reels and the counter tell you where you actually are on the
+            tape.
+          </dd>
+
+          <dt class="faq__q">Can I make a playlist look like a mixtape?</dt>
+          <dd class="faq__a">
+            Yes, and sound like one. Doodle the cover on the pad and it prints onto the
+            j-card label of the cassette. The share link carries your drawing, the running
+            order and every effect setting, so the tape opens on the other end the way you
+            left it.
+          </dd>
+
+          <dt class="faq__q">Do my songs get uploaded anywhere?</dt>
+          <dd class="faq__a">
+            No. There is no backend and no account. Files are decoded in your browser and
+            stay on your machine.
+          </dd>
+
+          <dt class="faq__q">Why does a tape I was sent say a track is missing?</dt>
+          <dd class="faq__a">
+            The link carries the tracklist, the settings and the cover, not the audio. The
+            built-in tracks are synthesized in code, so they rebuild anywhere. A track that
+            came from someone's own file will ask you for that file.
+          </dd>
+        </dl>
+
+        <p class="page__cta">
+          <a class="button button--primary" href="https://github.com/ctkrug/side-b">
+            View on GitHub
+          </a>
+        </p>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <p class="footer__line">Side B, a browser toy by Charlie Krug.</p>
+      <a class="footer__link" href="https://apps.charliekrug.com">
+        More by Charlie Krug <span aria-hidden="true">&rarr;</span>
+      </a>
+    </footer>
+
+  </body>
+</html>
