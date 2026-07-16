@@ -1,5 +1,5 @@
 import { createTapeChain } from "./tapeChain.js";
-import { trackAtElapsed } from "../mixtape/state.js";
+import { totalDurationSeconds, trackAtElapsed } from "../mixtape/state.js";
 
 /**
  * The transport. Owns the AudioContext, schedules tracks back to back, and
@@ -103,6 +103,17 @@ export function createPlayer({ context, getBuffer }) {
     return state === TRANSPORT_STATES.PAUSED ? pausedElapsed : 0;
   }
 
+  function stopTransport() {
+    if (state === TRANSPORT_STATES.STOPPED) {
+      return false;
+    }
+    teardownVoices();
+    pausedElapsed = 0;
+    state = TRANSPORT_STATES.STOPPED;
+    emit();
+    return true;
+  }
+
   return {
     get state() {
       return state;
@@ -157,23 +168,20 @@ export function createPlayer({ context, getBuffer }) {
       return this.play(null, pausedElapsed);
     },
 
-    stop() {
-      if (state === TRANSPORT_STATES.STOPPED) {
-        return false;
-      }
-      teardownVoices();
-      pausedElapsed = 0;
-      state = TRANSPORT_STATES.STOPPED;
-      emit();
-      return true;
-    },
+    stop: stopTransport,
 
     /**
-     * Advance the wobble on every live chain. Called once per animation
-     * frame by the render loop.
+     * Advance the wobble on every live chain, and park the transport once
+     * the tape has run out. Called once per animation frame by the render
+     * loop, which is also what makes it the place that notices the end:
+     * the last source ending is not itself an event the tape observes.
      */
     update() {
       if (state !== TRANSPORT_STATES.PLAYING) {
+        return;
+      }
+      if (elapsedSeconds() >= totalDurationSeconds(mixtape)) {
+        stopTransport();
         return;
       }
       const time = context.currentTime;
