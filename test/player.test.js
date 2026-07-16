@@ -125,6 +125,21 @@ describe("play", () => {
     expect(player.elapsedSeconds()).toBeCloseTo(0);
   });
 
+  // A BufferSource throws on a non-finite start time, which would leave
+  // the transport wedged mid-play with half its voices scheduled.
+  it.each([[NaN], ["soon"], [undefined]])(
+    "treats the unreadable start offset %p as the beginning",
+    (offset) => {
+      const { ctx, player } = build();
+      expect(player.play(tape(), offset)).toBe(true);
+      expect(player.elapsedSeconds()).toBeCloseTo(0);
+      for (const source of startedSources(ctx)) {
+        expect(Number.isFinite(source.startedAt)).toBe(true);
+        expect(Number.isFinite(source.startOffset ?? 0)).toBe(true);
+      }
+    },
+  );
+
   it("stops the previous voices when restarted", () => {
     const { ctx, player } = build();
     player.play(tape());
