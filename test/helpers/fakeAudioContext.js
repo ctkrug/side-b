@@ -8,6 +8,39 @@
 class FakeParam {
   constructor(value = 0) {
     this.value = value;
+    // Recorded automation, so tests can assert on envelopes and ramps.
+    this.events = [];
+  }
+
+  _record(method, value, time) {
+    this.events.push({ method, value, time });
+    this.value = value;
+    return this;
+  }
+
+  setValueAtTime(value, time) {
+    return this._record("setValueAtTime", value, time);
+  }
+
+  linearRampToValueAtTime(value, time) {
+    return this._record("linearRampToValueAtTime", value, time);
+  }
+
+  exponentialRampToValueAtTime(value, time) {
+    if (value === 0) {
+      throw new RangeError("exponentialRampToValueAtTime cannot target 0");
+    }
+    return this._record("exponentialRampToValueAtTime", value, time);
+  }
+
+  setTargetAtTime(value, time, constant) {
+    this.events.push({ method: "setTargetAtTime", value, time, constant });
+    this.value = value;
+    return this;
+  }
+
+  cancelScheduledValues(time) {
+    return this._record("cancelScheduledValues", this.value, time);
   }
 }
 
@@ -121,11 +154,13 @@ export class FakeAudioContext {
     node.frequency = new FakeParam(440);
     node.detune = new FakeParam(0);
     node.started = false;
-    node.start = () => {
+    node.start = (when = 0) => {
       node.started = true;
+      node.startedAt = when;
     };
-    node.stop = () => {
+    node.stop = (when = 0) => {
       node.stopped = true;
+      node.stoppedAt = when;
     };
     return this._track(node);
   }
