@@ -11,13 +11,16 @@ export function removeTrack(tray, trackId) {
   return tray.filter((track) => track.id !== trackId);
 }
 
+/** A drag payload is a string, so an index is only trustworthy once checked. */
+function isSlot(index, tray) {
+  return Number.isInteger(index) && index >= 0 && index < tray.length;
+}
+
 export function reorderTrack(tray, fromIndex, toIndex) {
-  if (
-    fromIndex < 0 ||
-    fromIndex >= tray.length ||
-    toIndex < 0 ||
-    toIndex >= tray.length
-  ) {
+  if (!isSlot(fromIndex, tray) || !isSlot(toIndex, tray)) {
+    return tray;
+  }
+  if (fromIndex === toIndex) {
     return tray;
   }
   const next = [...tray];
