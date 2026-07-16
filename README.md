@@ -74,6 +74,7 @@ and [`docs/BACKLOG.md`](docs/BACKLOG.md) for what is left.
 npm install
 npm run dev      # local dev server
 npm test         # unit tests
+npm run coverage # unit tests + a coverage report
 npm run lint     # eslint
 npm run build    # static production build into dist/
 ```
