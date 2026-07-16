@@ -304,6 +304,49 @@ describe("reaching the end of the tape", () => {
   });
 });
 
+describe("retape", () => {
+  const shorter = () =>
+    createMixtape({ tracks: [{ id: "a", title: "A", durationSeconds: 10 }] });
+
+  it("stops a rolling tape, because a take cannot be re-cut mid-roll", () => {
+    const { ctx, player } = build();
+    player.play(tape());
+    const sources = musicSources(ctx);
+    expect(player.retape(shorter())).toBe(true);
+    expect(player.state).toBe(TRANSPORT_STATES.STOPPED);
+    for (const source of sources) {
+      expect(source.stopped).toBe(true);
+    }
+  });
+
+  it("adopts the new tracklist, so a later play uses it", () => {
+    const { ctx, player } = build();
+    player.play(tape());
+    player.retape(shorter());
+    player.play();
+    expect(musicSources(ctx).filter((node) => node.started)).toHaveLength(3);
+    expect(player.currentTrack().track.id).toBe("a");
+  });
+
+  it("drops a paused playhead rather than resuming into a stale tape", () => {
+    const { ctx, player } = build();
+    player.play(tape());
+    ctx.currentTime = 12;
+    player.pause();
+    player.retape(shorter());
+    expect(player.state).toBe(TRANSPORT_STATES.STOPPED);
+    expect(player.elapsedSeconds()).toBe(0);
+  });
+
+  it("is a quiet no-op while the deck is already stopped", () => {
+    const { player } = build();
+    expect(player.retape(shorter())).toBe(false);
+    expect(player.state).toBe(TRANSPORT_STATES.STOPPED);
+    // Still adopted, even though nothing had to be interrupted.
+    expect(player.play()).toBe(true);
+  });
+});
+
 describe("live parameter edits", () => {
   it("applies effect changes to the matching track's chain only", () => {
     const { player } = build();
