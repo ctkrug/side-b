@@ -1,4 +1,6 @@
 export default [
+  // Build and coverage output is generated, not authored.
+  { ignores: ["dist/", "coverage/"] },
   {
     files: ["src/**/*.js", "test/**/*.js"],
     languageOptions: {
