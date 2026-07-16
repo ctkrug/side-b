@@ -20,6 +20,7 @@ export default [
         Image: "readonly",
         FileReader: "readonly",
         navigator: "readonly",
+        Node: "readonly",
       },
     },
     rules: {
