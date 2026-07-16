@@ -110,13 +110,16 @@ export function trackAtElapsed(mixtape, elapsedSeconds) {
 }
 
 /**
- * Fraction of the whole tape played, 0..1. An empty tape reads as 0 rather
- * than NaN so the reel renderer always has a finite number to draw with.
+ * Fraction of the whole tape played, 0..1. An empty tape — or a playhead
+ * that is not a number — reads as 0 rather than NaN, because the reel
+ * renderer turns this into canvas geometry, and a non-finite radius throws
+ * there and takes the animation loop down with it.
  */
 export function tapeProgress(mixtape, elapsedSeconds) {
   const total = totalDurationSeconds(mixtape);
-  if (total <= 0) {
+  const elapsed = Number(elapsedSeconds);
+  if (total <= 0 || Number.isNaN(elapsed)) {
     return 0;
   }
-  return clamp(elapsedSeconds / total, 0, 1);
+  return clamp(elapsed / total, 0, 1);
 }
