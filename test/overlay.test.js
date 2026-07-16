@@ -18,7 +18,7 @@ import { describe, expect, it } from "vitest";
  * these read the real CSS and pin the invariant the cascade has to hold.
  */
 
-const CSS_FILES = ["main.css", "layout.css", "components.css"];
+const CSS_FILES = ["main.css", "layout.css", "components.css", "page.css"];
 
 // Read from the project root, not via `new URL(..., import.meta.url)`: Vite
 // rewrites that form into an asset import and hands back the wrong file.
@@ -44,18 +44,17 @@ function positionRules() {
 }
 
 /**
- * Selector lists in the sheet include pseudo-elements (`*::before`), which
- * no element can match; treat those as "does not apply" rather than as an
- * error.
+ * `matches` takes a whole selector list, so hand it the selector intact:
+ * splitting on commas would cut `:not(.grain, .toaster-host)` in half, and
+ * a forgiving parser reads the fragment back as `:not(.grain)`. Selectors
+ * naming a pseudo-element match nothing and throw, which is "no".
  */
 function matchesAny(element, selectorList) {
-  return selectorList.split(",").some((part) => {
-    try {
-      return element.matches(part.trim());
-    } catch {
-      return false;
-    }
-  });
+  try {
+    return element.matches(selectorList);
+  } catch {
+    return false;
+  }
 }
 
 function mount(html) {
