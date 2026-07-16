@@ -680,3 +680,26 @@
   font-family: var(--font-ui);
   font-size: 0.78rem;
 }
+
+/**
+ * A finger needs a 44px target where a mouse pointer does not. Keyed on
+ * pointer type rather than viewport width: a narrow desktop window is not
+ * a touch device, a large tablet is, and coarsening the desktop
+ * composition to serve phones would help neither.
+ */
+@media (pointer: coarse) {
+  .text-button,
+  .chip {
+    min-height: 44px;
+    padding: 0 var(--space-2);
+  }
+
+  .toast__link {
+    min-height: 44px;
+  }
+
+  /* The visible track stays slim; only the grab area grows. */
+  .slider__input {
+    height: 44px;
+  }
+}
