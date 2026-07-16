@@ -43,6 +43,25 @@ describe("reorderTrack", () => {
     expect(reorderTrack(tray, 0, 5)).toEqual(tray);
     expect(reorderTrack(tray, -1, 1)).toEqual(tray);
   });
+
+  // An index arrives from a drag payload, which is a string a hostile page
+  // can set to anything; a comparison against NaN is false either way.
+  it.each([
+    [NaN, 1],
+    [0, NaN],
+    [1.5, 0],
+    [0, 1.5],
+    ["a", 1],
+    [undefined, 1],
+  ])("ignores the non-integer index pair (%p, %p)", (from, to) => {
+    const tray = [trackA, trackB, trackC];
+    expect(reorderTrack(tray, from, to)).toBe(tray);
+  });
+
+  it("is a no-op when a track is dropped on itself", () => {
+    const tray = [trackA, trackB];
+    expect(reorderTrack(tray, 1, 1)).toBe(tray);
+  });
 });
 
 describe("totalDurationSeconds", () => {
