@@ -1,0 +1,125 @@
+/* The static page under the deck: what Side B is, and the answers people
+   arrive looking for. Same tokens as the app, so the page and the product
+   read as one object rather than a product with a brochure stapled on. */
+
+/* Above the grain, which is fixed and would otherwise wash the text: an
+   in-flow box paints below a positioned one, whatever its z-index. */
+.page,
+.footer {
+  position: relative;
+  z-index: 1;
+}
+
+.page {
+  padding: var(--space-8) var(--space-2) var(--space-6);
+  background: linear-gradient(180deg, var(--bg), var(--surface-1));
+  border-top: 1px solid rgba(244, 233, 216, 0.08);
+}
+
+.page__inner {
+  max-width: 70ch;
+  margin: 0 auto;
+}
+
+.page__title {
+  font-size: clamp(1.75rem, 4vw, 2.4rem);
+  color: var(--text);
+}
+
+.page__subtitle {
+  margin-top: var(--space-6);
+  font-size: 1.35rem;
+  color: var(--accent);
+}
+
+.page p {
+  color: var(--text-muted);
+  margin: var(--space-2) 0 0;
+}
+
+.page__lead {
+  font-size: 1.05rem;
+  color: var(--text);
+}
+
+/* The privacy line is the one people scan for; give it a tape-green edge
+   rather than another paragraph of muted body text. */
+.page__note {
+  padding-left: var(--space-2);
+  border-left: 2px solid var(--accent-support);
+}
+
+/* ---- FAQ ---- */
+
+.faq {
+  margin: var(--space-3) 0 0;
+}
+
+.faq__q {
+  margin-top: var(--space-3);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.05rem;
+  color: var(--text);
+}
+
+.faq__a {
+  margin: var(--space-1) 0 0;
+  color: var(--text-muted);
+}
+
+.page__cta {
+  margin-top: var(--space-6);
+}
+
+/* ---- footer ---- */
+
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-1);
+  max-width: 70ch;
+  margin: 0 auto;
+  padding: var(--space-3) var(--space-2) var(--space-6);
+  font-size: 0.85rem;
+}
+
+.footer__line {
+  margin: 0;
+  color: var(--text-muted);
+}
+
+.footer__link {
+  color: var(--text-muted);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  padding: var(--space-1) 0;
+  transition:
+    color var(--motion-ui) var(--ease-out),
+    border-color var(--motion-ui) var(--ease-out);
+}
+
+.footer__link:hover,
+.footer__link:focus-visible {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+.footer__link:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+@media (max-width: 560px) {
+  .page {
+    padding-top: var(--space-6);
+  }
+
+  .footer {
+    justify-content: center;
+    text-align: center;
+  }
+}
