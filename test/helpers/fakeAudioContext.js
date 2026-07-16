@@ -12,8 +12,10 @@ class FakeParam {
 }
 
 class FakeNode {
-  constructor(type) {
-    this.type = type;
+  // The node kind lives on `nodeType`, not `type`: BiquadFilter and
+  // Oscillator both expose a real `type` property that would clobber it.
+  constructor(nodeType) {
+    this.nodeType = nodeType;
     this.outputs = [];
     this.disconnected = false;
   }
@@ -82,6 +84,7 @@ export class FakeAudioContext {
 
   createBiquadFilter() {
     const node = new FakeNode("biquad");
+    node.type = "lowpass";
     node.frequency = new FakeParam(350);
     node.Q = new FakeParam(1);
     node.gain = new FakeParam(0);
@@ -114,6 +117,7 @@ export class FakeAudioContext {
 
   createOscillator() {
     const node = new FakeNode("oscillator");
+    node.type = "sine";
     node.frequency = new FakeParam(440);
     node.detune = new FakeParam(0);
     node.started = false;
@@ -143,8 +147,8 @@ export class FakeAudioContext {
 }
 
 /** Nodes of a given type that this context handed out. */
-export function nodesOfType(ctx, type) {
-  return ctx.created.filter((node) => node.type === type);
+export function nodesOfType(ctx, nodeType) {
+  return ctx.created.filter((node) => node.nodeType === nodeType);
 }
 
 /** Whether a path exists from `from` to `to` by following connections. */
