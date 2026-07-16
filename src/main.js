@@ -287,6 +287,11 @@ function boot() {
   function setEffect(trackId, key, amount) {
     mixtape = setTrackEffect(mixtape, trackId, key, amount);
     const track = mixtape.tracks.find((entry) => entry.id === trackId);
+    if (!track) {
+      // A slider event still in flight for a track that has just been
+      // dropped: setTrackEffect ignored it, and so should we.
+      return;
+    }
     // Live: there is no baked file, so the graph changes underneath.
     player?.setTrackEffects(trackId, track.effects);
   }
