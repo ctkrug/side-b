@@ -56,5 +56,11 @@ export function normalizeAngle(angle) {
     return 0;
   }
   const wrapped = angle % TAU;
-  return wrapped < 0 ? wrapped + TAU : wrapped;
+  if (wrapped >= 0) {
+    return wrapped;
+  }
+  // A tiny negative angle rounds straight back up to TAU when added to it,
+  // which is one full turn — the same place as 0, and outside [0, TAU).
+  const turned = wrapped + TAU;
+  return turned < TAU ? turned : 0;
 }
