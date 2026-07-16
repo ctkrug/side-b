@@ -115,7 +115,7 @@ transitions are sample-accurate instead of timer-driven.
 
 ## Testing
 
-`npm test` — 369 tests, no browser required.
+`npm test` — 366 tests, no browser required.
 
 - Pure logic (DSP maths, state, codec, reel physics) is tested directly.
 - The Web Audio graph is tested against `test/helpers/fakeAudioContext.js`, a
