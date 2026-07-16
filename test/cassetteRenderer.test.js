@@ -18,6 +18,27 @@ const reelAngles = (ctx) =>
     )
     .map((call) => call.args[0]);
 
+/**
+ * The shell's body gradient runs to #b8ae9b at its foot, which is where
+ * the counter is printed — so that is the background the counter's ink has
+ * to survive, not the lighter shell face above it.
+ */
+const SHELL_LOWER_EDGE = "#b8ae9b";
+
+const relativeLuminance = (hex) => {
+  const channel = (i) => {
+    const c = parseInt(hex.slice(1 + i * 2, 3 + i * 2), 16) / 255;
+    return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+  };
+  return 0.2126 * channel(0) + 0.7152 * channel(1) + 0.0722 * channel(2);
+};
+
+/** WCAG contrast, so a legibility claim is measured rather than asserted. */
+const contrastRatio = (a, b) => {
+  const [light, dark] = [relativeLuminance(a), relativeLuminance(b)].sort((x, y) => y - x);
+  return (light + 0.05) / (dark + 0.05);
+};
+
 const baseState = (overrides = {}) => ({
   progress: 0,
   playing: false,
@@ -119,6 +140,16 @@ describe("drawCassette", () => {
     const ctx = render({ elapsedSeconds: 75, totalSeconds: 180 });
     const texts = ctx.callsTo("fillText").map((call) => call.args[0]);
     expect(texts).toContain("1:15 / 3:00");
+  });
+
+  // The counter is printed on the cream shell, so it needs shell-dark ink:
+  // the muted body colour measured 1.07:1 against the shell's lower edge.
+  it("prints the counter in ink dark enough to read on the shell", () => {
+    const ctx = render({ elapsedSeconds: 75, totalSeconds: 180 });
+    const counter = ctx
+      .callsTo("fillText")
+      .find((call) => call.args[0] === "1:15 / 3:00");
+    expect(contrastRatio(counter.fillStyle, SHELL_LOWER_EDGE)).toBeGreaterThanOrEqual(4.5);
   });
 
   it("draws the tape title on the label", () => {
