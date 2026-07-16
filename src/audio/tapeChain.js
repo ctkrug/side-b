@@ -2,6 +2,7 @@ import { buildSaturationCurve, saturationMakeupGain } from "./saturation.js";
 import { DEFAULT_WOW_FLUTTER, wowFlutterOffsetMs } from "./wowFlutter.js";
 import { DEFAULT_EFFECTS, normalizeEffects } from "../mixtape/state.js";
 import { clamp } from "./utils.js";
+import { generateWhiteNoise } from "./noise.js";
 
 /**
  * The tape chain: the live Web Audio graph that makes a track sound like
@@ -54,10 +55,7 @@ export function delaySecondsAt(timeSeconds, amount) {
 function createNoiseBuffer(ctx) {
   const length = Math.floor(ctx.sampleRate * NOISE_BUFFER_SECONDS);
   const buffer = ctx.createBuffer(1, length, ctx.sampleRate);
-  const channel = buffer.getChannelData(0);
-  for (let i = 0; i < length; i++) {
-    channel[i] = Math.random() * 2 - 1;
-  }
+  buffer.getChannelData(0).set(generateWhiteNoise(length));
   return buffer;
 }
 
