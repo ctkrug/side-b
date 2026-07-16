@@ -46,12 +46,14 @@
 }
 
 .deck {
+  /* Sticky, because the tray beside it scrolls long; sized to the viewport
+     so it fills its column rather than stranding the page in empty brown. */
   position: sticky;
   top: var(--space-2);
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
-  min-height: 70vh;
+  min-height: calc(100dvh - var(--space-8) - var(--space-3));
   padding: var(--space-2);
   border-radius: var(--radius);
   background:
