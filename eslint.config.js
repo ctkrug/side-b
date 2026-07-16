@@ -21,6 +21,8 @@ export default [
         FileReader: "readonly",
         navigator: "readonly",
         Node: "readonly",
+        setTimeout: "readonly",
+        clearTimeout: "readonly",
       },
     },
     rules: {
