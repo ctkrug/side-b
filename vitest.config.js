@@ -7,5 +7,14 @@ export default defineConfig({
     // with a `@vitest-environment jsdom` docblock.
     environment: "node",
     include: ["test/**/*.test.js"],
+    coverage: {
+      provider: "v8",
+      include: ["src/**/*.js"],
+      // main.js is the composition root: it is wiring, and the only honest
+      // way to judge it is to use the deck. Everything it wires is covered
+      // here on its own.
+      exclude: ["src/main.js"],
+      reporter: ["text", "html"],
+    },
   },
 });
