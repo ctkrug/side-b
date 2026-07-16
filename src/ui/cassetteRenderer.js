@@ -34,6 +34,9 @@ const PALETTE = {
   accentSupport: "#5a8f7b",
   danger: "#d1495b",
   label: "#f0e4cb",
+  // Printed on the shell rather than glowing on the page: light-on-dark
+  // body text is unreadable against cream plastic.
+  ink: "#3a2c20",
 };
 
 // A cassette is ~100mm x 64mm; keeping that ratio is what makes the shape
@@ -172,7 +175,7 @@ function drawLabel(ctx, shell, { title, cover }) {
     ctx.restore();
   }
 
-  ctx.fillStyle = "#3a2c20";
+  ctx.fillStyle = PALETTE.ink;
   ctx.font = `500 ${height * 0.19}px "Baloo 2", ui-rounded, sans-serif`;
   ctx.textBaseline = "alphabetic";
   const maxWidth = cover ? width * 0.6 : width * 0.9;
@@ -310,7 +313,7 @@ function drawCounter(ctx, shell, state) {
   ctx.font = `600 ${shell.height * 0.055}px Inter, sans-serif`;
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  ctx.fillStyle = PALETTE.textMuted;
+  ctx.fillStyle = PALETTE.ink;
   ctx.fillText(text, shell.x + shell.width * 0.2, shell.y + shell.height * 0.88);
 }
 
