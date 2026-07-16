@@ -27,14 +27,32 @@ Drag three tracks into the tray, hit record, and the cassette reels visibly spin
 a warm, hissy, slightly-warped version of the audio plays in real time — before you've
 touched a single setting.
 
-## Planned features
+## Using it
 
-- Drag-and-drop track tray (local files or sample library)
-- Live tape-emulation chain: wow/flutter, saturation, hiss, tone
-- Canvas cassette player frame-synced to playback
-- Hand-drawn cover art doodle pad (canvas, exportable as the mixtape's cover)
-- Shareable mixtape link (state encoded client-side, no backend required)
-- Per-track and master tape-effect controls
+1. **Load the tray.** Click a built-in track, or drop your own audio files onto
+   the tray (they are decoded in your browser and never uploaded anywhere).
+2. **Hit record.** The reels spin, the tape counter runs, and you hear the full
+   chain — wow/flutter, saturation and hiss — with no setup.
+3. **Turn the knobs.** Each track has its own wow/flutter, saturation and hiss
+   sliders. They retune the live audio graph as you drag: there is no baked
+   file to re-render.
+4. **Doodle a cover** on the pad, and it appears on the cassette's j-card label.
+5. **Share the tape.** The whole mixtape — track list, every effect setting and
+   your doodle — is encoded into the link itself. No account, no backend.
+
+Built-in tracks are synthesized from scratch in code, which is what lets a
+shared link rebuild the exact same tape on someone else's machine. A tape
+containing your own files will list those tracks as missing for whoever opens
+it, and ask them to supply the audio.
+
+## Features
+
+- Drag-and-drop track tray with reorderable rows (local files or built-in tracks)
+- Live tape chain: wow/flutter, saturation and a filtered hiss floor, per track
+- Canvas cassette frame-synced to `AudioContext` playback position
+- Hand-drawn cover art doodle pad, drawn onto the cassette label
+- Shareable mixtape link, encoded client-side with no backend
+- Synthesized interface sounds with a mute toggle that persists
 
 ## Stack
 
@@ -46,8 +64,9 @@ touched a single setting.
 
 ## Status
 
-Early scaffold — see [`docs/VISION.md`](docs/VISION.md) for the full design and
-[`docs/BACKLOG.md`](docs/BACKLOG.md) for the build plan.
+The core is built and playable end to end. See [`docs/VISION.md`](docs/VISION.md)
+for the design, [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for the code map,
+and [`docs/BACKLOG.md`](docs/BACKLOG.md) for what is left.
 
 ## Development
 
@@ -55,8 +74,11 @@ Early scaffold — see [`docs/VISION.md`](docs/VISION.md) for the full design an
 npm install
 npm run dev      # local dev server
 npm test         # unit tests
+npm run lint     # eslint
 npm run build    # static production build into dist/
 ```
+
+The build is base-path relative, so `dist/` can be served from any subpath.
 
 ## License
 
