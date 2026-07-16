@@ -1,0 +1,20 @@
+{
+  "name": "side-b",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Pick songs, watch them record onto an animated cassette with real tape DSP, and share the mixtape.",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "lint": "eslint src test"
+  },
+  "devDependencies": {
+    "eslint": "^9.9.0",
+    "vite": "^5.4.0",
+    "vitest": "^2.0.5"
+  },
+  "license": "MIT"
+}
