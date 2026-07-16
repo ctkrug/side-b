@@ -56,6 +56,9 @@
   font-weight: 600;
   border: 1px solid transparent;
   cursor: pointer;
+  /* A link wearing .button is still a link: strip the underline it would
+     otherwise carry into the control. */
+  text-decoration: none;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -68,7 +71,7 @@
     color var(--motion-ui) var(--ease-out);
 }
 
-:where(button, [role="button"], input, label.text-button):focus-visible {
+:where(button, [role="button"], input, label.text-button, a.button):focus-visible {
   outline: 3px solid var(--accent);
   outline-offset: 2px;
 }
