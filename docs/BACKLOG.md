@@ -196,6 +196,34 @@ resulting link in a fresh page — track, effect value and cover art all restore
 no further input (URL length 500). A corrupted `#tape=` payload renders the error
 banner and leaves the app fully usable.
 
+## QA — what was hardened
+
+Sweeps run against the built site in Chromium plus the unit suite (444 tests,
+99.7% of lines in `src/`, `main.js` excluded as wiring). Nine bugs fixed, each
+with a failing test first:
+
+| Found | Fix |
+|---|---|
+| A link naming 4000 sample tracks asked the browser for 21GB of PCM and took the tab down | `MAX_TRACKS` (64) bounds what a URL can ask for |
+| The tape ran past its last track forever — reels spinning, readout still "Recording" | the player parks itself at the end of the tape |
+| A track dropped mid-take kept playing; a pause/resume across an edit resumed a stale tape | every tray edit goes through `player.retape` |
+| A packed cover colour of `"constructor"` resolved to a function | palette indices resolve only at real integer slots |
+| A NaN drag index moved the first track instead of being ignored | `reorderTrack` requires integer slots |
+| A non-finite playhead reached canvas geometry, which throws and kills the render loop for good | `tapeProgress` and the renderer keep it finite |
+| `sfx.play("__proto__")` threw; `play("constructor")` reported a silent hit | voices resolve from own keys only |
+| Touch targets were 22–36px against the 44px the standard asks for | a `pointer: coarse` block lifts them |
+| The tape counter measured 1.07:1 on the cassette shell | printed in shell ink, 6.13:1 |
+
+Also: a suite test recomputed an O(n) reduction inside a per-sample `map`, taking
+~4s and failing the 5s timeout whenever the suite ran loaded — it was already red
+on a full run. Verified by driving the real page: a corrupt and a hostile link both
+yield the designed banner and a working app; garbage in `localStorage` boots clean;
+share → reload restores the tape; heap and listener counts stay flat over ten
+record rounds; the render loop's own work is 0.5ms median against a 16.7ms budget;
+the whole task completes on the keyboard with a visible focus ring at all 13 stops;
+the deck holds 90% of viewport height at 1440 and 57% on an iPhone 13, matching
+DESIGN.md's layout intent.
+
 ## Not yet done
 
 These fall outside the three epics above and are candidates for QA/polish:
