@@ -139,7 +139,9 @@ export function createPlayer({ context, getBuffer }) {
         return false;
       }
       teardownVoices();
-      pausedElapsed = Math.max(0, fromElapsed);
+      // A BufferSource throws on a non-finite start time, which would wedge
+      // the transport with only some of its voices scheduled.
+      pausedElapsed = Number.isFinite(fromElapsed) ? Math.max(0, fromElapsed) : 0;
       startedAt = context.currentTime;
       scheduleFrom(pausedElapsed);
       if (voices.length === 0) {
