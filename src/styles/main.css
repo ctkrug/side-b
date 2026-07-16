@@ -1,0 +1,75 @@
+:root {
+  --bg: #1c140f;
+  --surface-1: #2b2018;
+  --surface-2: #3a2c20;
+  --text: #f4e9d8;
+  --text-muted: #b9a68d;
+  --accent: #e8934a;
+  --accent-support: #5a8f7b;
+  --danger: #d1495b;
+  --success: #7fae5a;
+
+  --font-display: "Baloo 2", ui-rounded, sans-serif;
+  --font-ui: "Inter", -apple-system, "Segoe UI", sans-serif;
+
+  --space-1: 8px;
+  --space-2: 16px;
+  --space-3: 24px;
+  --space-4: 32px;
+  --space-6: 48px;
+  --space-8: 64px;
+
+  --radius: 14px;
+  --radius-pill: 999px;
+
+  --shadow-panel: 0 2px 4px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.35);
+  --glow-accent: 0 0 24px rgba(232, 147, 74, 0.25);
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --motion-ui: 160ms;
+  --motion-feedback: 100ms;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-ui);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  margin: 0;
+}
+
+button,
+select,
+input {
+  font-family: inherit;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
