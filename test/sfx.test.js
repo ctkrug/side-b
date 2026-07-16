@@ -105,6 +105,18 @@ describe("createSfx", () => {
     expect(soundingNodes(context)).toHaveLength(0);
   });
 
+  // The voice table is a plain object, so every name on Object.prototype
+  // "exists" on it: __proto__ is not callable and constructor plays silence
+  // while reporting a hit.
+  it.each([["constructor"], ["toString"], ["__proto__"], ["valueOf"]])(
+    "treats the inherited name %p as unknown",
+    (name) => {
+      const { sfx, context } = build();
+      expect(sfx.play(name)).toBe(false);
+      expect(soundingNodes(context)).toHaveLength(0);
+    },
+  );
+
   it("keeps interface sounds well under full scale", () => {
     const { sfx, context } = build();
     sfx.play("chunk");
