@@ -253,6 +253,16 @@ describe("packCover and unpackCover", () => {
     expect(recovered.strokes[0].width).toBeLessThanOrEqual(24);
   });
 
+  // A colour index out of a share link indexes the palette array, so any
+  // property name — not just a number — would otherwise resolve.
+  it.each([["constructor"], ["length"], ["toString"], [-1], [1.5], [null]])(
+    "falls back to a palette colour for the index %p",
+    (index) => {
+      const recovered = unpackCover([{ c: index, w: 30, p: [100, 100] }]);
+      expect(COVER_COLORS).toContain(recovered.strokes[0].color);
+    },
+  );
+
   it("returns null when nothing survives unpacking", () => {
     expect(unpackCover([{ p: [] }])).toBeNull();
   });
