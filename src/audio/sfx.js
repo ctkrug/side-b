@@ -29,8 +29,11 @@ export function readMutePreference(storage) {
 }
 
 export function writeMutePreference(storage, muted) {
+  if (!storage) {
+    return false;
+  }
   try {
-    storage?.setItem(MUTE_STORAGE_KEY, String(muted));
+    storage.setItem(MUTE_STORAGE_KEY, String(muted));
     return true;
   } catch {
     return false;
