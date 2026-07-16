@@ -198,7 +198,8 @@ banner and leaves the app fully usable.
 
 ## QA — what was hardened
 
-Sweeps run against the built site in Chromium plus the unit suite (444 tests,
+Sweeps run against the built site in Chromium plus the unit suite (445 tests at
+the time; 448 after closeout,
 99.7% of lines in `src/`, `main.js` excluded as wiring). Nine bugs fixed, each
 with a failing test first:
 
@@ -224,11 +225,38 @@ the whole task completes on the keyboard with a visible focus ring at all 13 sto
 the deck holds 90% of viewport height at 1440 and 57% on an iPhone 13, matching
 DESIGN.md's layout intent.
 
+## CLOSEOUT — what the ship gate found
+
+Re-verified QA's ledger independently rather than taking it on trust: coverage
+re-measured at 99.7% of lines (matching what QA reported), and the garbage-link
+probe re-run against the decoder — hostile payloads (prototype keys, a 5000-track
+list, non-finite durations) still throw only `ShareLinkError`, and a corrupt
+`localStorage` still boots clean. Both claims held.
+
+One bug found, fixed test-first:
+
+| Found | Fix |
+|---|---|
+| Every toast rendered below the fold, unseen: the rule lifting `#app`'s children off the grain outranked `.toaster-host`'s own `position: fixed` and dropped the overlay layer into flow. The share link shown when the clipboard is denied, the missing-track notice and every error were all invisible | the stacking rule exempts the toaster; a test parses the real sheet and fails on any rule that outranks it |
+
+It shipped past 445 unit tests because jsdom resolves no stylesheet specificity:
+a cascade bug is invisible to a DOM-only suite. The regression test reads the CSS
+with postcss and asserts no higher-specificity rule un-fixes the overlay.
+
+Also fixed: a link wearing `.button` (the new page's GitHub CTA) kept its underline
+and fell outside the `:focus-visible` rule, which named only real buttons.
+
+Design ship gate (D4), driven in Chromium against the built site: no horizontal
+overflow at 390/768/1440; the deck holds 79% of viewport height at 1440; all 22
+keyboard stops carry a 3px amber focus ring; sliders are themed, not native; both
+fonts load; every touch target clears 44px; `prefers-reduced-motion` collapses
+transitions. The static page under the deck uses the app's own tokens and sheet,
+so page and product are one brand.
+
 ## Not yet done
 
 These fall outside the three epics above and are candidates for QA/polish:
 
-- A landing page (`site/`) — CLOSEOUT needs one, sharing the app's tokens.
 - Master (whole-tape) effect controls; today every control is per-track.
 - Renaming a tape: the title is fixed at "Side B" and shown on the j-card, but
   there is no UI to edit it (the codec already carries it).
