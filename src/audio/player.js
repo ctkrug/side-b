@@ -171,6 +171,18 @@ export function createPlayer({ context, getBuffer }) {
     stop: stopTransport,
 
     /**
+     * Adopt an edited tracklist. Voices are scheduled ahead on the audio
+     * clock from one snapshot of the tape, so an edit under a rolling take
+     * would otherwise keep playing the old tracks — and a paused playhead
+     * would point into a tape that no longer exists. Both cases park the
+     * transport: you re-cut a tape from the top, not in the middle.
+     */
+    retape(nextMixtape) {
+      mixtape = nextMixtape ?? mixtape;
+      return stopTransport();
+    },
+
+    /**
      * Advance the wobble on every live chain, and park the transport once
      * the tape has run out. Called once per animation frame by the render
      * loop, which is also what makes it the place that notices the end:
