@@ -240,6 +240,7 @@ function boot() {
         );
       }
     }
+    player?.retape(mixtape);
     renderTray();
     renderTransport();
   }
@@ -252,6 +253,7 @@ function boot() {
       const track = library.createSampleTrack(sampleId);
       mixtape = { ...mixtape, tracks: addTrack(mixtape.tracks, track) };
       sound("chunk");
+      player?.retape(mixtape);
       renderTray();
       renderTransport();
     } catch {
@@ -263,9 +265,9 @@ function boot() {
     mixtape = { ...mixtape, tracks: removeTrack(mixtape.tracks, trackId) };
     library?.forget(trackId);
     sound("click");
-    if (mixtape.tracks.length === 0) {
-      player?.stop();
-    }
+    // The take is scheduled from a snapshot of the tape: an edit has to
+    // reach the player, or the dropped track keeps playing.
+    player?.retape(mixtape);
     renderTray();
     renderTransport();
   }
@@ -277,7 +279,9 @@ function boot() {
     }
     mixtape = { ...mixtape, tracks };
     sound("click");
+    player?.retape(mixtape);
     renderTray();
+    renderTransport();
   }
 
   function setEffect(trackId, key, amount) {
