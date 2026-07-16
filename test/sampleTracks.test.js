@@ -71,13 +71,21 @@ describe("SAMPLE_TRACKS", () => {
 });
 
 describe("renderSampleTrack", () => {
-  const spec = SAMPLE_TRACKS[0];
+  // Render a shortened spec: these assert the synthesis maths, and a full
+  // 12-second render per test is slow enough to risk a CI timeout.
+  const short = (track) => ({ ...track, durationSeconds: 1 });
+  const spec = short(SAMPLE_TRACKS[0]);
   const sampleRate = 8000;
 
   it("renders the requested number of samples", () => {
     const pcm = renderSampleTrack(spec, sampleRate);
     expect(pcm).toBeInstanceOf(Float32Array);
     expect(pcm.length).toBe(spec.durationSeconds * sampleRate);
+  });
+
+  it("renders a full-length built-in track at its declared duration", () => {
+    const track = SAMPLE_TRACKS[0];
+    expect(renderSampleTrack(track, 8000).length).toBe(track.durationSeconds * 8000);
   });
 
   const peakOf = (pcm) => pcm.reduce((max, s) => Math.max(max, Math.abs(s)), 0);
@@ -92,7 +100,7 @@ describe("renderSampleTrack", () => {
 
   it("renders every built-in track without clipping or silence", () => {
     for (const track of SAMPLE_TRACKS) {
-      const peak = peakOf(renderSampleTrack(track, sampleRate));
+      const peak = peakOf(renderSampleTrack(short(track), sampleRate));
       expect(peak).toBeGreaterThan(0.1);
       expect(peak).toBeLessThanOrEqual(1);
     }
@@ -105,8 +113,8 @@ describe("renderSampleTrack", () => {
   });
 
   it("renders each sample track distinctly", () => {
-    const first = renderSampleTrack(SAMPLE_TRACKS[0], sampleRate);
-    const second = renderSampleTrack(SAMPLE_TRACKS[1], sampleRate);
+    const first = renderSampleTrack(short(SAMPLE_TRACKS[0]), sampleRate);
+    const second = renderSampleTrack(short(SAMPLE_TRACKS[1]), sampleRate);
     expect(Array.from(first)).not.toEqual(Array.from(second));
   });
 
