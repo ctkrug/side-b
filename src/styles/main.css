@@ -8,6 +8,7 @@
   --accent-support: #5a8f7b;
   --danger: #d1495b;
   --success: #7fae5a;
+  --label: #f0e4cb;
 
   --font-display: "Baloo 2", ui-rounded, sans-serif;
   --font-ui: "Inter", -apple-system, "Segoe UI", sans-serif;
@@ -23,6 +24,8 @@
   --radius-pill: 999px;
 
   --shadow-panel: 0 2px 4px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.35);
+  --shadow-raised: 0 1px 2px rgba(0, 0, 0, 0.4), 0 3px 8px rgba(0, 0, 0, 0.3);
+  --shadow-pressed: 0 1px 1px rgba(0, 0, 0, 0.5);
   --glow-accent: 0 0 24px rgba(232, 147, 74, 0.25);
 
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
@@ -56,6 +59,36 @@ h2,
 h3 {
   font-family: var(--font-display);
   margin: 0;
+  line-height: 1.15;
+}
+
+/* A film of grain over the whole page: the tell that separates a treated
+   surface from a flat fill. Sits above the background, below everything. */
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.5;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.28'/%3E%3C/svg%3E");
+}
+
+#app > *:not(.grain) {
+  position: relative;
+  z-index: 1;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 button,
