@@ -364,7 +364,11 @@ export function createCassetteRenderer(canvas, { getState, win = globalThis }) {
     lastTime = now;
 
     const state = getState();
-    const progress = clamp(state.progress ?? 0, 0, 1);
+    // Canvas geometry throws on a non-finite argument, and a throw here
+    // means no next frame is requested — one bad number would freeze the
+    // deck for the session rather than for a frame.
+    const reported = Number(state.progress);
+    const progress = Number.isNaN(reported) ? 0 : clamp(reported, 0, 1);
     const playing = Boolean(state.playing);
 
     // Idle-spin when stopped, so the deck never looks dead (DESIGN.md's
