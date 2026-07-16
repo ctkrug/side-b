@@ -1,6 +1,6 @@
 import { createAudioContext, createPlayer } from "./audio/player.js";
 import { AudioLoadError, createLibrary } from "./audio/library.js";
-import { createSfx } from "./audio/sfx.js";
+import { createSfx, readMutePreference, writeMutePreference } from "./audio/sfx.js";
 import {
   EFFECT_KEYS,
   createMixtape,
@@ -68,6 +68,9 @@ function boot() {
   let strokeColor = COVER_COLORS[0];
   let linkError = null;
   let pendingMixtape = null;
+  // Mirrored here because the mute button must show the stored preference
+  // at boot, long before a gesture creates the AudioContext and the SFX bus.
+  let muted = false;
 
   const refs = {};
 
@@ -100,6 +103,7 @@ function boot() {
     }
     library = createLibrary({ context });
     sfx = createSfx({ context, storage: safeStorage() });
+    muted = sfx.isMuted();
     player = createPlayer({ context, getBuffer: (track) => library.get(track.id) });
     player.onStateChange(renderTransport);
     syncMuteButton();
@@ -651,7 +655,6 @@ function boot() {
   }
 
   function syncMuteButton() {
-    const muted = sfx?.isMuted() ?? false;
     refs.mute.setAttribute("aria-pressed", String(muted));
     refs.mute.classList.toggle("is-muted", muted);
     clear(refs.mute).append(
@@ -721,7 +724,11 @@ function boot() {
       onClick: () => {
         // Toggling sound is itself the gesture that may create the context.
         ensureAudio();
-        const muted = sfx?.toggleMute() ?? false;
+        muted = sfx ? sfx.toggleMute() : !muted;
+        if (!sfx) {
+          // No Web Audio here, but the preference should still stick.
+          writeMutePreference(safeStorage(), muted);
+        }
         syncMuteButton();
         if (!muted) {
           sound("click");
@@ -793,6 +800,8 @@ function boot() {
     toasterHost,
   );
 
+  muted = readMutePreference(safeStorage());
+  syncMuteButton();
   renderTray();
   renderTransport();
   refs.redrawDoodle?.();
