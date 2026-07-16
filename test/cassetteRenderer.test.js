@@ -195,6 +195,25 @@ describe("createCassetteRenderer", () => {
     };
   };
 
+  // Canvas geometry throws on a non-finite argument, and a throw inside the
+  // frame callback means no next frame is ever requested — the deck would
+  // freeze for the rest of the session rather than skip one bad frame.
+  it.each([[NaN], [undefined], [Infinity], ["half"], [null]])(
+    "draws only finite geometry when progress is %p",
+    (progress) => {
+      const { canvas, renderer, win } = build({ progress });
+      renderer.start();
+      win.flushFrame(0);
+      win.flushFrame(16);
+      const numbers = canvas.getContext("2d").calls.flatMap((call) =>
+        call.args.filter((arg) => typeof arg === "number"),
+      );
+      expect(numbers.length).toBeGreaterThan(0);
+      expect(numbers.every((value) => Number.isFinite(value))).toBe(true);
+      expect(win.pendingFrames()).toBe(1);
+    },
+  );
+
   it("rejects a missing canvas or an unavailable 2d context", () => {
     expect(() => createCassetteRenderer(null, { getState: () => ({}) })).toThrow(
       TypeError,
