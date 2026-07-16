@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
+  MAX_PAYLOAD_LENGTH,
+  MAX_TRACKS,
   SAFE_URL_LENGTH,
   ShareLinkError,
   buildShareUrl,
@@ -97,6 +99,54 @@ describe("round-trip", () => {
       tracks: [{ id: "solo", title: "Solo", durationSeconds: 5 }],
     });
     expect(decodeMixtape(encodeMixtape(original))).toEqual(original);
+  });
+});
+
+describe("decodeMixtape against a hostile link", () => {
+  const encodeRaw = (payload) =>
+    btoa(unescape(encodeURIComponent(JSON.stringify(payload))))
+      .replace(/\+/g, "-")
+      .replace(/\//g, "_")
+      .replace(/=+$/, "");
+
+  const manyTracks = (count) =>
+    encodeRaw({
+      v: 1,
+      t: "Boom",
+      k: Array.from({ length: count }, (_, i) => ({
+        i: `t${i}`,
+        n: "x",
+        s: "sample",
+        m: "moonlit-drive",
+        d: 30,
+        e: [1, 1, 1],
+      })),
+    });
+
+  // A link is only text, and the recipient synthesizes every sample track
+  // it names into PCM: an unbounded tracklist is a memory bomb in a URL.
+  it("refuses a tracklist no cassette could hold", () => {
+    expect(() => decodeMixtape(manyTracks(MAX_TRACKS + 1))).toThrow(ShareLinkError);
+  });
+
+  it("still accepts a tape right at the track ceiling", () => {
+    expect(decodeMixtape(manyTracks(MAX_TRACKS)).tracks).toHaveLength(MAX_TRACKS);
+  });
+
+  it("refuses a payload far larger than any real tape", () => {
+    const bloated = encodeRaw({
+      v: 1,
+      t: "x".repeat(MAX_PAYLOAD_LENGTH),
+      k: [{ i: "a", n: "a", s: "sample", m: "moonlit-drive", d: 1, e: [0, 0, 0] }],
+    });
+    expect(bloated.length).toBeGreaterThan(MAX_PAYLOAD_LENGTH);
+    expect(() => decodeMixtape(bloated)).toThrow(ShareLinkError);
+  });
+
+  it("gives the same designed error as any other unreadable link", () => {
+    expect(() => decodeMixtape(manyTracks(MAX_TRACKS + 1))).toThrow(
+      /too (big|many)|more tracks/i,
+    );
   });
 });
 
