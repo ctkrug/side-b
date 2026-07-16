@@ -24,6 +24,17 @@ export const DEFAULT_STROKE_WIDTH = 3;
 /** Coordinates are quantized to 1/1000 — past that is invisible but costly. */
 const PRECISION = 1000;
 
+/**
+ * A packed colour is an index into the palette, and it arrives from a
+ * share link — so it has to be a real slot, not merely something that
+ * indexes the array. "constructor" would otherwise resolve to a function.
+ */
+function paletteColor(index) {
+  return Number.isInteger(index) && index >= 0 && index < COVER_COLORS.length
+    ? COVER_COLORS[index]
+    : COVER_COLORS[0];
+}
+
 export function quantize(value) {
   return Math.round(clamp(value, 0, 1) * PRECISION) / PRECISION;
 }
@@ -167,7 +178,7 @@ export function unpackCover(packed) {
       continue;
     }
     strokes.push({
-      color: COVER_COLORS[entry.c] ?? COVER_COLORS[0],
+      color: paletteColor(entry.c),
       width: clamp(Number(entry.w) / 10 || DEFAULT_STROKE_WIDTH, 1, 24),
       points,
     });
