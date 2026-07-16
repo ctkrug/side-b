@@ -15,7 +15,15 @@ export function el(tag, props = {}, children = []) {
     } else if (key === "dataset") {
       Object.assign(node.dataset, value);
     } else if (key === "style") {
-      Object.assign(node.style, value);
+      for (const [property, setting] of Object.entries(value)) {
+        // setProperty, not Object.assign: custom properties (--x) are not
+        // reachable as style object keys and would be dropped silently.
+        if (property.startsWith("--")) {
+          node.style.setProperty(property, setting);
+        } else {
+          node.style[property] = setting;
+        }
+      }
     } else if (key.startsWith("on") && typeof value === "function") {
       node.addEventListener(key.slice(2).toLowerCase(), value);
     } else if (key in node && key !== "list") {
@@ -35,6 +43,21 @@ export function el(tag, props = {}, children = []) {
 
 export function clear(node) {
   node.replaceChildren();
+  return node;
+}
+
+/**
+ * Append children, skipping absent ones. Element.append stringifies null
+ * into the literal text "null", so a conditional child rendered as null
+ * would otherwise appear on the page.
+ */
+export function append(node, ...children) {
+  for (const child of children.flat()) {
+    if (child === null || child === undefined || child === false) {
+      continue;
+    }
+    node.append(child);
+  }
   return node;
 }
 
