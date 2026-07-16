@@ -12,7 +12,7 @@ visitor picks, and the whole mixtape rides in the URL.
 | Unit tests | `npm test` (vitest) |
 | Coverage | `npm run coverage` |
 | Lint | `npm run lint` |
-| Production build | `npm run build` → `dist/` |
+| Production build | `npm run build` → `site/` (committed; this is what gets published) |
 | Preview the build | `npm run preview` |
 
 The build is base-path relative (`base: "./"` in `vite.config.js`) so it can be
