@@ -263,6 +263,47 @@ describe("update", () => {
   });
 });
 
+describe("reaching the end of the tape", () => {
+  it("stops itself once the last track has played out", () => {
+    const { ctx, player } = build();
+    player.play(tape());
+    ctx.currentTime = 30;
+    player.update();
+    expect(player.state).toBe(TRANSPORT_STATES.STOPPED);
+    expect(player.isPlaying()).toBe(false);
+    expect(player.elapsedSeconds()).toBe(0);
+  });
+
+  it("keeps playing right up to the final moment of the tape", () => {
+    const { ctx, player } = build();
+    player.play(tape());
+    ctx.currentTime = 29.9;
+    player.update();
+    expect(player.state).toBe(TRANSPORT_STATES.PLAYING);
+  });
+
+  it("releases the voices it scheduled when the tape runs out", () => {
+    const { ctx, player } = build();
+    player.play(tape());
+    const sources = musicSources(ctx);
+    ctx.currentTime = 30;
+    player.update();
+    for (const source of sources) {
+      expect(source.stopped).toBe(true);
+    }
+  });
+
+  it("announces the stop so the transport can re-render", () => {
+    const { ctx, player } = build();
+    const seen = [];
+    player.onStateChange((state) => seen.push(state));
+    player.play(tape());
+    ctx.currentTime = 30;
+    player.update();
+    expect(seen).toEqual([TRANSPORT_STATES.PLAYING, TRANSPORT_STATES.STOPPED]);
+  });
+});
+
 describe("live parameter edits", () => {
   it("applies effect changes to the matching track's chain only", () => {
     const { player } = build();
