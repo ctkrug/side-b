@@ -94,7 +94,10 @@ describe("the tape chain versus a plain gain change", () => {
 
   it("differs from the source even after matching levels", () => {
     const engaged = saturate(tone, 0.7);
-    const matched = engaged.map((s) => s * (rms(tone) / rms(engaged)));
+    // Hoisted: rms walks the whole signal, and inside the callback it ran
+    // once per sample — 11k times over 11k samples.
+    const levelMatch = rms(tone) / rms(engaged);
+    const matched = engaged.map((s) => s * levelMatch);
     let difference = 0;
     for (let i = 0; i < tone.length; i++) {
       difference = Math.max(difference, Math.abs(matched[i] - tone[i]));
