@@ -10,6 +10,7 @@ visitor picks, and the whole mixtape rides in the URL.
 |---|---|
 | Dev server | `npm run dev` |
 | Unit tests | `npm test` (vitest) |
+| Coverage | `npm run coverage` |
 | Lint | `npm run lint` |
 | Production build | `npm run build` → `dist/` |
 | Preview the build | `npm run preview` |
@@ -40,7 +41,7 @@ src/styles/         main.css (tokens) · layout.css (composition) · components.
 | `analysis.js` | RMS / peak / Goertzel / THD — lets tests *measure* the DSP |
 | `sampleTracks.js` | the three built-in tracks, synthesized deterministically to PCM |
 | `tapeChain.js` | **the tape chain** — assembles the live per-track graph |
-| `player.js` | the transport: schedules tracks, owns elapsed time |
+| `player.js` | the transport: schedules tracks, owns elapsed time, parks at the end of the tape |
 | `library.js` | resolves tracks → `AudioBuffer` (synth samples, decoded files) |
 | `sfx.js` | synthesized interface sounds + the persisted mute preference |
 
@@ -112,20 +113,40 @@ transitions are sample-accurate instead of timer-driven.
 - **Errors are handled at the boundary.** `ShareLinkError` and `AudioLoadError`
   are the only two error types the UI presents; a corrupt link yields a
   designed banner and a working app, never a blank page.
+- **A link is a stranger's input.** Opening one costs real memory: every
+  sample track it names is synthesized to PCM on arrival, so `MAX_TRACKS`
+  (64) bounds what a URL can ask the browser to build. Deliberately *not* a
+  cap on payload length — an over-budget link still decodes, since
+  `SAFE_URL_LENGTH` warns rather than blocks, and a big doodle is cheap
+  where a track is not.
+- **A tape is cut in one take.** The player schedules every voice ahead on
+  the audio clock from one snapshot of the tracklist, so an edit made while
+  the tape rolls cannot reach the take that is already playing. Any tray
+  edit therefore goes through `player.retape`, which adopts the new list and
+  parks the transport: you re-cut a tape from the top, not in the middle.
 
 ## Testing
 
-`npm test` — 366 tests, no browser required.
+`npm test` — 444 tests, no browser required. `npm run coverage` reports
+99.7% of lines across `src/`, excluding `main.js` (see below).
 
 - Pure logic (DSP maths, state, codec, reel physics) is tested directly.
 - The Web Audio graph is tested against `test/helpers/fakeAudioContext.js`, a
   recording fake; tests locate nodes by **following connections**, not by
   construction order, so they survive a rewiring.
 - Canvas rendering is tested against `test/helpers/fakeCanvas.js`, which records
-  draw calls and drives `requestAnimationFrame` by hand.
+  draw calls and drives `requestAnimationFrame` by hand. The fake accepts NaN
+  where a real canvas throws, so tests assert on the *numbers* the renderer
+  emits rather than merely driving it.
 - `test/tapeCharacter.test.js` asserts the chain's *character* by measurement
   (THD rises monotonically with drive; transparent at 0; no clipping).
-- `test/dom.test.js` opts into jsdom via a `@vitest-environment` docblock.
+- `test/properties.test.js` states the invariants as fast-check properties —
+  the codecs round-trip, the playhead stays inside the tape, reel geometry
+  stays finite — and generates the inputs to break them.
+- `test/dom.test.js` and `test/toast.test.js` opt into jsdom via a
+  `@vitest-environment` docblock.
+- `main.js` is excluded from coverage: it is the composition root, so it is
+  wiring rather than logic, and everything it wires is covered on its own.
 
 **Verified in a real browser** (not in CI — needs Chromium): rendering the chain
 through an `OfflineAudioContext` gives THD 0.000 bypassed vs 0.240 engaged, peak
